@@ -9,7 +9,7 @@ x = float(0)
 x1 = float(0)
 y = float(4)
 y1 = float(0)
-dx = float(0.1)
+dx = float(0.001)
 k = float(0)
 k1= float(0)
 #define functions
@@ -24,25 +24,22 @@ def increment_y(y,k):
     y1 = y + dx * k
     return y1
 
-def last_k(x,y):
-    return ((3 * x ** 3 + 2 * x ** 2 + 4) / (2 * y))
+def dy_dx(x1,y1):
+    return ((9 * x ** 2 + 4 * x ) / (2 * y))
 
-def new_k(x1,y1):
-    return ((3 * x ** 3 + 2 * x ** 2 + 4) / (2 * y))
-
-k = new_k(x , y)
+k = dy_dx(x , y)
 ylist.append(y)
 #loop
-for n in range(1,1000):
+for n in range(1,int(2/dx)):
     y1=increment_y(y,k)
     x1=increment_x(x)
     ylist.append(y1)
-    k = new_k(x1 , y1)
+    k = dy_dx(x1 , y1)
     y=y1
     x=x1
     n+=1
 
-xplot = np.arange(0 , 100 , 0.1)
+xplot = np.arange(0 , 100 , dx)
 yplot = np.array(ylist)
 plt.figure()
 plt.plot(xplot, func(xplot) , color = 'red' , linestyle = '--')
