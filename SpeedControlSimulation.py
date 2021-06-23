@@ -13,30 +13,27 @@ k = 0.5 * 0.24 * 1.225 * 5
 Fp = 3000
 
 #Controller variables
-Kp = 1 #Coefficient of proportion control
-Kd = 0.03 #Coefficient of differentiation control
-Ki = 0.065 #Coefficient of integral control
-error = set_speed - v
-I = error * dt  #Accumulation for integral control
-last_error = error
-t_final = 60 #Total length of time
+Kp = 0.030 #Coefficient of proportion control
+Ki = 0.0009 #Coefficient of integral control
+Kd = 5  #Coefficient of differentiation control
+error =0.00 #set_speed - v
+I = 0.00 #error * dt  #Accumulation for integral control
+last_error =0.00 #error
+t_final = 1200 #Total length of time
 
 #Plotting variables
 ulist=[]
 vlist=[]
 tlist=[]
 elist=[]
-clist=[]#List for set speed
+clist=[]
 
 #Define functions
-#Controller
-def PControl(v):
-    return (set_speed - v)
+#Controlle
 def DControl(last_error, error):
     return (error - last_error) / dt
 def IControl(I, error):
-    I = I + error * dt
-    return I
+    return I + error * dt
 
 #Relate u to dvdt
 def dvdt(u, v):
@@ -54,12 +51,12 @@ def plotNormal():
     plt.ylabel('Velovity m/s')
     plt.xlabel('Time/s')
     plt.plot(tlist, vlist, label='Actual speed', color='000000')
-    plt.plot(tlist, clist, label='Set speed', linestyle='--', color='000000')
+    plt.plot(tlist, clist, label='Set speed', linestyle='--', color='red')
 
     plt.subplot(1, 2, 2)
     plt.ylabel('Gas padel/%')
     plt.xlabel('Time/s')
-    plt.plot(tlist, ulist, color='000000')
+    plt.plot(tlist, ulist, color='blue')
     plt.legend
     plt.show()
 
@@ -69,14 +66,14 @@ def plotAni():
     plt.ylabel('Velovity m/s')
     plt.xlabel('Time/s')
     plt.plot(tlist, vlist, label='Actual speed',color='000000')
-    plt.plot(tlist, clist, label='Set speed', linestyle='--',color='000000')
+    plt.plot(tlist, clist, label='Set speed', linestyle='--',color='red')
 
     plt.subplot(1, 2, 2)
     plt.ylabel('Gas padel/%')
     plt.xlabel('Time/s')
-    plt.plot(tlist, ulist,color='000000')
+    plt.plot(tlist, ulist,color='blue')
     plt.legend
-    plt.pause(1/60)
+    plt.pause(0.01)
 
 aniflag = False
 #Main program starts
@@ -88,17 +85,32 @@ else:
 
 while t <= t_final:
     error = set_speed - v
-    u = Kp * PControl(v) + Ki * IControl(I, error) + Kd * DControl(last_error, error)
+    I = IControl(I,error)
+    u = Kp * error + Ki * I #+ Kd * DControl(last_error, error)
     u = correct(u)
     v += dt * dvdt(u, v)
     vlist.append(v)
     ulist.append(u)
-    elist.append(error)
     last_error = error
     t += dt
     tlist.append(t)
     clist.append(set_speed)
+    if t >= 180.0:
+        set_speed = 5
+    if t >= 300.0:
+        set_speed = 30
+    if t >= 700:
+        set_speed = 6
     if aniflag == True:
         plotAni()
 
 plotNormal()
+# MaxV = 0.00
+# Stable = 0.00
+# k = 0.00
+# Time = 0.00
+# for i in range (0,3001):
+#     if vlist[i] > MaxV:
+#         MaxV = vlist[i]
+#     Overshoot=MaxV-set_speed
+# print('Overshoot = ' + str(Overshoot))
